@@ -205,7 +205,14 @@ function draw() {
   line(splitX, clockSliderY, splitX, imgHeight + clockSliderY); // Draw line at the split position
 
   // printMainTitle("time");
-  printMainTitle();
+  // printMainTitle();
+  if (timeRevealed) {
+    // show the time as the main title of the clock
+    printMainTitle("time");
+  } else {
+    // show the default title of the clock
+    printMainTitle();
+  }
   printLeftClockSliderLine(decimalTimeToString(open));
   printRightClockSliderLine(decimalTimeToString(close));
   printLeftSignifier(splitX);
@@ -224,11 +231,6 @@ function draw() {
   image(video, -clockFrameWidth, 280, videoWidth, videoHeight);
   noStroke();
 
-  if (timeRevealed) {
-    // show the time as the main title of the clock
-    printMainTitle("time");
-  }
-
   if (!targetPosesSet) {
     setTargetPoses();
     targetPosesSet = true;
@@ -238,19 +240,25 @@ function draw() {
     printInteractionInstructions("Do these ", "three poses ", "to get the ", "exact time.");
     renderPoseImagesBg();
     renderPoseImages(...targetPoseImages);
-    renderCurrentPoseImageAcrossTheCameraFrame();
+    !timeRevealed && renderCurrentPoseImageAcrossTheCameraFrame();
   }
 
-  // leaving a green background for a while if the pose is matched
+  // leaving a green background over the camera frame for a while if the pose is matched
   if (poseMatched) {
-    background(performedPoseRectColor);
+    fill(performedPoseRectColor);
+    noStroke();
+    rect(clockFrameWidth, 0, interactionFrameWidth, interactionFrameHeight);
   }
 
   // if person is in the currently checking pose...
   const currentSetPose = targetPoseImages.find(pose => pose.state == "current")?.poseName;
   if (currentSetPose == currentDetectedPose && !timeRevealed) {
     poseMatched = true;
-    background(performedPoseRectColor);
+
+    // show a green background over the camera frame
+    fill(performedPoseRectColor);
+    noStroke();
+    rect(clockFrameWidth, 280, interactionFrameWidth, interactionFrameHeight);
 
     const lastPoseMatched = targetPoseImages[2].state == "current";
     if (lastPoseMatched) {
